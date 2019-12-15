@@ -1,4 +1,5 @@
 using Bijector.Infrastructure.Queues;
+using Bijector.Workflows.Messages.Events;
 
 namespace Bijector.Workflows
 {
