@@ -13,6 +13,6 @@ namespace Bijector.Workflows.Models
 
         public WorkflowState State { get; set; }
 
-        public List<WorkflowNode> WorkflowNodes { get; set; }
+        public List<IWorkflowNode> WorkflowNodes { get; set; }
     }
 }

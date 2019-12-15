@@ -9,13 +9,25 @@ using Newtonsoft.Json.Linq;
 
 namespace Bijector.Workflows.Models
 {
-    public class TimeConditonalWorkflowNode : StartWorkflowNode
+    public class TimeStartWorkflowNode : IStartWorkflowNode
     {
+        public TimeStartWorkflowNode(DateTimeOffset nextExecutionTime)
+        {
+            NextExecutionTime = nextExecutionTime;
+        }
+
         public DateTimeOffset LastExecutionTime { get; set; }
 
         public DateTimeOffset NextExecutionTime { get; set; }
+        public string ServiceName { get; set; }
+        public int Id { get; set; }
 
-        public override (int?, JObject) HandleRequest(IEvent @event, int next)
+        public Task Execute(IContext context, IPublisher publisher, JObject parameters)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public (int?, JObject) HandleRequest(IEvent @event, int next)
         {
             if(@event is TimeArrivedEvent)
             {

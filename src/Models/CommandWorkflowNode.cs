@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Bijector.Infrastructure.Queues;
 using Bijector.Infrastructure.Types;
@@ -7,17 +9,32 @@ using Newtonsoft.Json.Linq;
 
 namespace Bijector.Workflows.Models
 {
-        public class CommandWorkflowNode : WorkflowNode
+    public class CommandWorkflowNode: IWorkflowNode
     {
+        public CommandWorkflowNode(){}
+
         public CommandWorkflowNode(ICommand command)
         {
             Command = command;
         }
 
-        public ICommand Command { get; }
+        public object Command { get; set; }
 
-        public async override Task Execute(IContext context, IPublisher publisher, JObject parameters)
+        //public string CommandType { get; set; }
+
+        public string ServiceName { get; set; }
+
+        public int Id { get; set; }
+
+        public async Task Execute(IContext context, IPublisher publisher, JObject parameters)
         {
+            /*Type objectType = (from asm in AppDomain.CurrentDomain.GetAssemblies()
+                   from type in asm.GetTypes()
+                   where type.IsClass && type.Name == CommandType
+                   select type).Single();
+            dynamic command = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(Command), objectType); */
+            dynamic command = Command;
+                 
             foreach(JProperty jProperty in parameters.Properties())
             {
                 if(Command.GetType().GetProperty(jProperty.Name) != null)
@@ -26,10 +43,11 @@ namespace Bijector.Workflows.Models
                     Command.GetType().GetProperty(jProperty.Name).SetValue(Command, parameter);
                 }
             }
-            await publisher.Send(Command, context);
+
+            await publisher.Send(command, context);
         }
 
-        public override (int?, JObject) HandleRequest(IEvent @event, int next)
+        public (int?, JObject) HandleRequest(IEvent @event, int next)
         {
             if(@event is IRejectedEvent)
             {

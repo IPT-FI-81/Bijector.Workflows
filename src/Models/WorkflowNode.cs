@@ -7,22 +7,18 @@ using Newtonsoft.Json.Linq;
 
 namespace Bijector.Workflows.Models
 {
-    public abstract class WorkflowNode
+    public interface IWorkflowNode
     {
-        public string ServiceName { get; set; }
+        string ServiceName { get; set; }
         
-        public int Id { get; set; }
+        int Id { get; set; }
 
-        public abstract Task Execute(IContext context, IPublisher publisher, JObject parameters);
+        Task Execute(IContext context, IPublisher publisher, JObject parameters);
 
-        public abstract (int?, JObject) HandleRequest(IEvent @event, int next);
+        public (int?, JObject) HandleRequest(IEvent @event, int next);
     }
 
-    public abstract class StartWorkflowNode : WorkflowNode
-    {
-        public override Task Execute(IContext context, IPublisher publisher, JObject parameters)
-        {
-            throw new System.NotImplementedException();
-        }
+    public interface IStartWorkflowNode : IWorkflowNode
+    {        
     }
 }

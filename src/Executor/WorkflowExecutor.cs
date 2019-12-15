@@ -80,7 +80,7 @@ namespace Bijector.Workflows.Executor
             var workflows = await workflowsRepository.FilterAsync(w => (w.State == WorkflowState.NonExecuted || w.State == WorkflowState.Success) && w.AccountId == context.UserId);
             foreach (var workflow in workflows)
             {
-                var startNode = (workflow.WorkflowNodes.Single(w => w.Id == workflow.CurrentNodeId) as StartWorkflowNode);
+                var startNode = (workflow.WorkflowNodes.Single(w => w.Id == workflow.CurrentNodeId) as IStartWorkflowNode);
                 var nextNodeId = workflow.WorkflowNodes[1].Id;            
                 int? nextId = null;
                 JObject nextParameters = null;
