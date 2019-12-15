@@ -5,6 +5,11 @@
     <UserSecretsId>8656900ecb90af57f5563d4a7744cba5</UserSecretsId>
   </PropertyGroup>
   
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc4" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0" />
+  </ItemGroup>
+
   <Choose>
     <When Condition="$(Configuration)=='Release'">
       <ItemGroup>
