@@ -41,4 +41,44 @@ namespace Bijector.Workflows.Handlers
             await base.Handle(command, context);
         }
     }
+
+    public class RenameDriveEntityRejectedHandler : AllHandler, IEventHandler<RenameDriveEntityRejected>
+    {
+        public RenameDriveEntityRejectedHandler(IWorkflowExecutor executor) : base(executor){}
+
+        public async Task Handle(RenameDriveEntityRejected command, IContext context)
+        {
+            await base.Handle(command, context);
+        }
+    }
+
+    public class MoveDriveEntityRejectedHandler : AllHandler, IEventHandler<MoveDriveEntityRejected>
+    {
+        public MoveDriveEntityRejectedHandler(IWorkflowExecutor executor) : base(executor){}
+
+        public async Task Handle(MoveDriveEntityRejected command, IContext context)
+        {
+            await base.Handle(command, context);
+        }
+    }
+
+    public class DriveEntityMovedHandler : AllHandler, IEventHandler<DriveEntityMoved>
+    {
+        public DriveEntityMovedHandler(IWorkflowExecutor executor) : base(executor){}
+
+        public async Task Handle(DriveEntityMoved command, IContext context)
+        {
+            await base.Handle(command, context);
+        }
+    }
+
+    public class ForceStartHandler : AllHandler, IEventHandler<ForceStartEvent>
+    {
+        public ForceStartHandler(IWorkflowExecutor executor) : base(executor){}
+
+        public async Task Handle(ForceStartEvent command, IContext context)
+        {
+            await base.Handle(command, context);
+        }
+    }
 }

@@ -8,11 +8,11 @@ namespace Bijector.Workflows.Messages.Commands
 
         public RenameDriveEntity(int serviceId, string id, string newName) : base(serviceId)
         {
-            Id = id;
+            EntityId = id;
             NewName = newName;
         }
 
-        public string Id { get; set; }
+        public string EntityId { get; set; }
         public string NewName { get; set; }
     }
 }

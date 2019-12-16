@@ -4,7 +4,7 @@ namespace Bijector.Workflows.Messages.Events
 {
     public class DriveEntityRenamed : IEvent
     {
-        public string Id { get; set; }
+        public string EntityId { get; set; }
         public string NewName { get; set; }
     }
 }

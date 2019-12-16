@@ -7,6 +7,7 @@ using Bijector.Infrastructure.Queues;
 using Bijector.Infrastructure.Repositories;
 using Bijector.Infrastructure.Types;
 using Bijector.Infrastructure.Types.Messages;
+using Bijector.Workflows.Messages.Events;
 using Bijector.Workflows.Models;
 using Newtonsoft.Json.Linq;
 
@@ -35,7 +36,12 @@ namespace Bijector.Workflows.Executor
             {
                 await AttemtStart(@event, context);
                 return true;
-            }                
+            }
+
+            if(@event is ForceStartEvent)
+            {
+                return await ForceStart(@event, context);
+            }
 
             var workflow = await workflowsRepository.GetByIdAsync(context.Id);
             if(workflow == null)
@@ -87,6 +93,31 @@ namespace Bijector.Workflows.Executor
             }            
         }
 
+        private async Task<bool> ForceStart(IEvent @event, IContext context)
+        {
+            var workflow = await workflowsRepository.GetByIdAsync(context.Id);
+            if(workflow != null && workflow.AccountId == context.UserId)
+            {                
+                try
+                {
+                    workflow.CurrentNodeId = workflow.WorkflowNodes[1].Id;
+                    workflow.State = WorkflowState.Running;
+                    var nextNode = workflow.WorkflowNodes.Single(w => w.Id == workflow.CurrentNodeId);
+                    var newContext = new BaseContext(workflow.Id, workflow.AccountId, "Bijector Workflows", nextNode.ServiceName);
+                    await nextNode.Execute(newContext, publisher, null);
+                    await workflowsRepository.UpdateAsync(workflow.Id, workflow);
+                    return true;
+                }
+                catch
+                {
+                    workflow.State = WorkflowState.Failed;
+                    await workflowsRepository.UpdateAsync(workflow.Id, workflow);
+                    return false;
+                }                
+            }
+            return false;
+        }
+
         private async Task AttemtStart(IEvent @event, IContext context)
         {
             IEnumerable<Workflow> workflows = null;
@@ -115,7 +146,7 @@ namespace Bijector.Workflows.Executor
                     catch
                     {
                         workflow.State = WorkflowState.Failed;
-                    }                    
+                    }
                     await workflowsRepository.UpdateAsync(workflow.Id, workflow);
                 }                
             }
