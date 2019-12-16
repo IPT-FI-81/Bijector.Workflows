@@ -2,6 +2,7 @@ using Bijector.Infrastructure.Handlers;
 using Bijector.Infrastructure.Queues;
 using Bijector.Workflows.Handlers;
 using Bijector.Workflows.Messages.Events;
+using Bijector.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Bijector.Workflows
@@ -22,6 +23,15 @@ namespace Bijector.Workflows
         public static void RegisterHandlers(this IServiceCollection services)
         {
             services.AddTransient<IEventHandler<TimeArrivedEvent>, TimeArrivedHandler>();
+            services.AddTransient<IEventHandler<DriveEntityRenamed>, DriveEntityRenamedHandler>();
+        }
+
+        public static void RegisterBSONTypes(this IServiceCollection services)
+        {
+            MongoDB.Bson.Serialization.BsonClassMap.RegisterClassMap<TimeStartWorkflowNode>();
+            MongoDB.Bson.Serialization.BsonClassMap.RegisterClassMap<CommandWorkflowNode>();
+            MongoDB.Bson.Serialization.BsonClassMap.RegisterClassMap<Messages.Commands.RenameDriveEntity>();
+            MongoDB.Bson.Serialization.BsonClassMap.RegisterClassMap<WorkflowNodeTimeStamps>();
         }
     }
 }

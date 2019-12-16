@@ -31,4 +31,14 @@ namespace Bijector.Workflows.Handlers
             await base.Handle(command, context);
         }
     }
+
+    public class DriveEntityRenamedHandler : AllHandler, IEventHandler<DriveEntityRenamed>
+    {
+        public DriveEntityRenamedHandler(IWorkflowExecutor executor) : base(executor){}
+
+        public async Task Handle(DriveEntityRenamed command, IContext context)
+        {
+            await base.Handle(command, context);
+        }
+    }
 }

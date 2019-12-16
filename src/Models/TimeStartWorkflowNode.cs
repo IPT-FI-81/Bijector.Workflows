@@ -78,7 +78,7 @@ namespace Bijector.Workflows.Models
                 var jsonTime = JObject.Parse(JsonConvert.SerializeObject(DateTimeOffset.Now));
                 return (next, jsonTime);
             }
-            return (Id, null);
+            return (null, null);
         }
     }
 }

@@ -60,14 +60,21 @@ namespace Bijector.Workflows.Executor
                                 
                 var nextNode = workflow.WorkflowNodes.Single(w => w.Id == workflow.CurrentNodeId);
                                 
-                if(workflow.WorkflowNodes.IndexOf(nextNode) == 0)
+                if(nextNode is IStartWorkflowNode)
                 {
                     workflow.State = WorkflowState.Success;
                 }
                 else
                 {
                     var newContext = new BaseContext(context.Id, workflow.AccountId, "Bijector Workflows", nextNode.ServiceName);
-                    await nextNode.Execute(newContext,publisher,nextParameters);                                       
+                    try
+                    {
+                        await nextNode.Execute(newContext, publisher, nextParameters);
+                    }
+                    catch
+                    {
+                        workflow.State = WorkflowState.Failed;
+                    }
                 }
                 await workflowsRepository.UpdateAsync(context.Id, workflow);
                 return true;             
@@ -101,9 +108,16 @@ namespace Bijector.Workflows.Executor
                     workflow.State = WorkflowState.Running;
                     var nextNode = workflow.WorkflowNodes.Single(w => w.Id == workflow.CurrentNodeId);
                     var newContext = new BaseContext(workflow.Id, workflow.AccountId, "Bijector Workflows", nextNode.ServiceName);
-                    await nextNode.Execute(newContext,publisher,nextParameters);                    
-                }
-                await workflowsRepository.UpdateAsync(workflow.Id, workflow);
+                    try
+                    {
+                        await nextNode.Execute(newContext, publisher, nextParameters);
+                    }
+                    catch
+                    {
+                        workflow.State = WorkflowState.Failed;
+                    }                    
+                    await workflowsRepository.UpdateAsync(workflow.Id, workflow);
+                }                
             }
         }
     }

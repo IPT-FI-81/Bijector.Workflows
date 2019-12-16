@@ -9,7 +9,6 @@ using Bijector.Workflows.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -29,16 +28,12 @@ namespace Bijector.Workflows
 
         public void ConfigureServices(IServiceCollection services)
         {
-            MongoDB.Bson.Serialization.BsonClassMap.RegisterClassMap<TimeStartWorkflowNode>();
-            MongoDB.Bson.Serialization.BsonClassMap.RegisterClassMap<CommandWorkflowNode>();
-            MongoDB.Bson.Serialization.BsonClassMap.RegisterClassMap<Messages.Commands.RenameDriveEntity>();
-            MongoDB.Bson.Serialization.BsonClassMap.RegisterClassMap<WorkflowNodeTimeStamps>();
-
             services.AddConsul(Configuration);
             services.AddConsulDiscover();
 
             services.AddRabbitMQ(Configuration);
 
+            services.RegisterBSONTypes();
             services.AddMongoDb(Configuration);
             services.AddMongoDbRepository<Workflow>("Workflows");
 
@@ -46,7 +41,7 @@ namespace Bijector.Workflows
 
             services.AddTransient<IWorkflowExecutor, WorkflowExecutor>();
 
-            services.RegisterHandlers();
+            services.RegisterHandlers();            
 
             var discover = services.BuildServiceProvider().GetService<IServiceDiscover>();
             var accountsUrl = discover.ResolveServicePath("Bijector Accounts");
