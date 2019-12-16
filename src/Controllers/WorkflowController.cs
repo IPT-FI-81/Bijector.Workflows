@@ -27,39 +27,11 @@ namespace Bijector.Workflows.Controllers
 
         [Authorize]
         [HttpGet("GetAll")]
-        public async Task<string> GetAll()
+        public async Task<IActionResult> GetAll()
         {
             var accountId = int.Parse(User.Identity.Name);
             var list = await workflows.FilterAsync(w => w.AccountId == accountId);
-            return JsonConvert.SerializeObject(list);
-        }
-
-        [Authorize]
-        [HttpGet("Generate")]
-        public async Task<IActionResult> GenerateSimpleWorkflow()
-        {
-            var accountId = int.Parse(User.Identity.Name);
-            var workflow = new Workflow();
-            workflow.AccountId = accountId;
-            workflow.State = WorkflowState.NonExecuted;
-            
-            var workflowNode1 = new TimeStartWorkflowNode(System.DateTimeOffset.Now.AddSeconds(30));
-            workflowNode1.ServiceName = "Bijector Workflows";
-            workflowNode1.Id = 0;
-
-            var command = new Bijector.Workflows.Messages.Commands.RenameDriveEntity(0, "1ucttWbsmfAhKccKYkNXMSY3ucFe8-G6h", $"{System.DateTimeOffset.Now.Minute}");
-            var workflowNode2 = new CommandWorkflowNode(command);
-            workflowNode2.ServiceName = "Bijector GDrive";
-            workflowNode2.Id = 1;
-
-            workflow.WorkflowNodes = new List<IWorkflowNode>
-            {
-                workflowNode1,
-                workflowNode2
-            };
-            await workflows.AddAsync(workflow);
-            
-            return new JsonResult(workflow);
+            return new JsonResult(list);
         }
 
         [Authorize]

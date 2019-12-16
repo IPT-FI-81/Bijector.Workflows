@@ -1,6 +1,6 @@
 using Bijector.Infrastructure.Types.Messages;
 
-namespace Bijector.Workflows.Messages.Commands
+namespace Bijector.Workflows.Messages.Events
 {
     public class RenameDriveEntityRejected : IRejectedEvent
     {

@@ -1,4 +1,6 @@
+using Bijector.Workflows.Services;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Bijector.Workflows
@@ -15,6 +17,10 @@ namespace Bijector.Workflows
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                })
+                .ConfigureServices(service =>
+                {
+                    service.AddHostedService<TimeService>();
                 });
     }
 }

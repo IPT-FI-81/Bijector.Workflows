@@ -46,6 +46,8 @@ namespace Bijector.Workflows
 
             services.AddTransient<IWorkflowExecutor, WorkflowExecutor>();
 
+            services.RegisterHandlers();
+
             var discover = services.BuildServiceProvider().GetService<IServiceDiscover>();
             var accountsUrl = discover.ResolveServicePath("Bijector Accounts");
 

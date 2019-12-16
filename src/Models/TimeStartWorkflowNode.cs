@@ -14,6 +14,8 @@ namespace Bijector.Workflows.Models
         public DateTimeOffset LastExecutionTime { get; set; }
 
         public DateTimeOffset NextExecutionTime { get; set; }
+
+        public double IntervalInSeconds { get; set; }
     }
 
     public class TimeStartWorkflowNode : IStartWorkflowNode
@@ -24,12 +26,13 @@ namespace Bijector.Workflows.Models
 
         public TimeStartWorkflowNode(){}
 
-        public TimeStartWorkflowNode(DateTimeOffset nextExecutionTime)
+        public TimeStartWorkflowNode(DateTimeOffset nextExecutionTime, TimeSpan interval)
         {
             Action = new WorkflowNodeTimeStamps
             {
                 LastExecutionTime = DateTimeOffset.MinValue,
-                NextExecutionTime = nextExecutionTime           
+                NextExecutionTime = nextExecutionTime,
+                IntervalInSeconds = interval.TotalSeconds      
             };            
         }
 
@@ -62,9 +65,11 @@ namespace Bijector.Workflows.Models
             {
                 var time = (@event as TimeArrivedEvent).Time;
                 if(time > (Action as WorkflowNodeTimeStamps).NextExecutionTime)
-                {
-                    var jsonTime = JObject.Parse(JsonConvert.SerializeObject(time));
+                {      
+                    var json = JsonConvert.SerializeObject(new{time = time});
+                    var jsonTime = JObject.Parse(json);
                     (Action as WorkflowNodeTimeStamps).LastExecutionTime = time;
+                    (Action as WorkflowNodeTimeStamps).NextExecutionTime = time.AddSeconds((Action as WorkflowNodeTimeStamps).IntervalInSeconds);
                     return (next, jsonTime);
                 }
             }
