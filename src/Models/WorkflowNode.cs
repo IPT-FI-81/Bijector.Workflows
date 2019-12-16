@@ -13,6 +13,12 @@ namespace Bijector.Workflows.Models
         
         int Id { get; set; }
 
+        string Type { get; set; }
+
+        string ActionType { get; set; }
+
+        object Action { get; set; }
+
         Task Execute(IContext context, IPublisher publisher, JObject parameters);
 
         public (int?, JObject) HandleRequest(IEvent @event, int next);

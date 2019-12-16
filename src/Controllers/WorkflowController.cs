@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Bijector.Infrastructure.Repositories;
 using Bijector.Workflows.Executor;
+using Bijector.Workflows.Messages.Commands;
 using Bijector.Workflows.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,13 +23,6 @@ namespace Bijector.Workflows.Controllers
         {
             this.executor = executor;
             this.workflows = workflows;
-        }
-
-        [Authorize]
-        [HttpPost("Create")]
-        public async Task<IActionResult> CreateWorkflow()
-        {
-            return Accepted();
         }
 
         [Authorize]
@@ -49,10 +45,12 @@ namespace Bijector.Workflows.Controllers
             
             var workflowNode1 = new TimeStartWorkflowNode(System.DateTimeOffset.Now.AddSeconds(30));
             workflowNode1.ServiceName = "Bijector Workflows";
+            workflowNode1.Id = 0;
 
             var command = new Bijector.Workflows.Messages.Commands.RenameDriveEntity(0, "1ucttWbsmfAhKccKYkNXMSY3ucFe8-G6h", $"{System.DateTimeOffset.Now.Minute}");
             var workflowNode2 = new CommandWorkflowNode(command);
             workflowNode2.ServiceName = "Bijector GDrive";
+            workflowNode2.Id = 1;
 
             workflow.WorkflowNodes = new List<IWorkflowNode>
             {
@@ -60,7 +58,44 @@ namespace Bijector.Workflows.Controllers
                 workflowNode2
             };
             await workflows.AddAsync(workflow);
+            
             return new JsonResult(workflow);
+        }
+
+        [Authorize]
+        [HttpPost("Create")]
+        public async Task<IActionResult> CreateWorkflow([FromBody]GenerateWorkflow command)
+        {
+            var accountId = int.Parse(User.Identity.Name);  
+
+            var workflow = new Workflow();
+            workflow.AccountId = accountId;
+            workflow.Name = command.Name;
+            workflow.Description = command.Description;
+            workflow.State = WorkflowState.NonExecuted;                        
+            workflow.WorkflowNodes = new List<IWorkflowNode>();
+
+            foreach (var node in command.WorkflowNodes)
+            {
+                var nodeType = (from asm in AppDomain.CurrentDomain.GetAssemblies()
+                   from type in asm.GetTypes()
+                   where type.IsClass && type.Name == node.Type
+                   select type).Single();
+                var actionType = (from asm in AppDomain.CurrentDomain.GetAssemblies()
+                   from type in asm.GetTypes()
+                   where type.IsClass && type.Name == node.ActionType
+                   select type).Single();
+                
+                dynamic workflowNode = nodeType.GetConstructor( new Type[]{} ).Invoke(null);
+                workflowNode.Id = node.Id;
+                workflowNode.ServiceName = node.ServiceName;
+                workflowNode.Action = JsonConvert.DeserializeObject(node.ActionJson, actionType);
+                
+                workflow.WorkflowNodes.Add(workflowNode);
+            }            
+
+            await workflows.AddAsync(workflow);
+            return Accepted();
         }
     }
 }

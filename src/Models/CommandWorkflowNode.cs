@@ -11,36 +11,45 @@ namespace Bijector.Workflows.Models
 {
     public class CommandWorkflowNode: IWorkflowNode
     {
+        private string type;
+
+        private string commandType;
+
         public CommandWorkflowNode(){}
 
         public CommandWorkflowNode(ICommand command)
         {
-            Command = command;
+            Action = command;
         }
 
-        public object Command { get; set; }
+        public object Action { get; set; }
 
-        //public string CommandType { get; set; }
+        public string Type
+        {
+            get { return this.GetType().Name; }
+            set { type = value; }
+        }
+
+        public string ActionType
+        {
+            get { return this.Action.GetType().Name; }
+            set { commandType = value; }
+        }
 
         public string ServiceName { get; set; }
 
         public int Id { get; set; }
 
         public async Task Execute(IContext context, IPublisher publisher, JObject parameters)
-        {
-            /*Type objectType = (from asm in AppDomain.CurrentDomain.GetAssemblies()
-                   from type in asm.GetTypes()
-                   where type.IsClass && type.Name == CommandType
-                   select type).Single();
-            dynamic command = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(Command), objectType); */
-            dynamic command = Command;
+        {            
+            dynamic command = Action;
                  
             foreach(JProperty jProperty in parameters.Properties())
             {
-                if(Command.GetType().GetProperty(jProperty.Name) != null)
+                if(Action.GetType().GetProperty(jProperty.Name) != null)
                 {
                     dynamic parameter = jProperty.ToObject<dynamic>();
-                    Command.GetType().GetProperty(jProperty.Name).SetValue(Command, parameter);
+                    Action.GetType().GetProperty(jProperty.Name).SetValue(Action, parameter);
                 }
             }
 

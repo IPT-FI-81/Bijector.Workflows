@@ -32,6 +32,7 @@ namespace Bijector.Workflows
             MongoDB.Bson.Serialization.BsonClassMap.RegisterClassMap<TimeStartWorkflowNode>();
             MongoDB.Bson.Serialization.BsonClassMap.RegisterClassMap<CommandWorkflowNode>();
             MongoDB.Bson.Serialization.BsonClassMap.RegisterClassMap<Messages.Commands.RenameDriveEntity>();
+            MongoDB.Bson.Serialization.BsonClassMap.RegisterClassMap<WorkflowNodeTimeStamps>();
 
             services.AddConsul(Configuration);
             services.AddConsulDiscover();
