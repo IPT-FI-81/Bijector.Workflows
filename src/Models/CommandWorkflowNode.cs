@@ -41,18 +41,20 @@ namespace Bijector.Workflows.Models
         public int Id { get; set; }
 
         public async Task Execute(IContext context, IPublisher publisher, JObject parameters)
-        {            
-            dynamic command = Action;
-                 
-            foreach(JProperty jProperty in parameters.Properties())
+        {                        
+            if(parameters != null)
             {
-                if(Action.GetType().GetProperty(jProperty.Name) != null)
+                foreach(JProperty jProperty in parameters.Properties())
                 {
-                    dynamic parameter = jProperty.ToObject<dynamic>();
-                    Action.GetType().GetProperty(jProperty.Name).SetValue(Action, parameter);
+                    if(Action.GetType().GetProperty(jProperty.Name) != null)
+                    {
+                        dynamic parameter = jProperty.ToObject<dynamic>();
+                        Action.GetType().GetProperty(jProperty.Name).SetValue(Action, parameter);
+                    }
                 }
             }
 
+            dynamic command = Action;
             await publisher.Send(command, context);
         }
 
@@ -61,7 +63,7 @@ namespace Bijector.Workflows.Models
             if(@event is IRejectedEvent)
             {
                 var reason = (@event as IRejectedEvent).Reason;
-                var jReason = JObject.Parse(JsonConvert.SerializeObject(reason));
+                var jReason = JObject.Parse(JsonConvert.SerializeObject(new{reason = reason}));
                 return (null, jReason);
             }
             return (next, JObject.Parse(JsonConvert.SerializeObject(@event)));

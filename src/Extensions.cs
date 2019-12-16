@@ -24,6 +24,10 @@ namespace Bijector.Workflows
         {
             services.AddTransient<IEventHandler<TimeArrivedEvent>, TimeArrivedHandler>();
             services.AddTransient<IEventHandler<DriveEntityRenamed>, DriveEntityRenamedHandler>();
+            services.AddTransient<IEventHandler<DriveEntityMoved>, DriveEntityMovedHandler>();
+            services.AddTransient<IEventHandler<RenameDriveEntityRejected>, RenameDriveEntityRejectedHandler>();
+            services.AddTransient<IEventHandler<MoveDriveEntityRejected>, MoveDriveEntityRejectedHandler>();
+            services.AddTransient<IEventHandler<ForceStartEvent>, ForceStartHandler>();
         }
 
         public static void RegisterBSONTypes(this IServiceCollection services)
