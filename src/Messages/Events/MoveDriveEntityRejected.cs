@@ -6,8 +6,6 @@ namespace Bijector.Workflows.Messages.Events
     {
         public string EnitityId { get; set; }
 
-        public string SourceId { get; set; }
-
         public string DestionationId { get; set; }
 
         public string Reason { get; set; }
